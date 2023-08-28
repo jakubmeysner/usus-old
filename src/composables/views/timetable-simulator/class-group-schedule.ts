@@ -1,10 +1,10 @@
 import type {
     Activity,
-    BaseClassGroupActivity,
     ClassGroup2Activity,
     ClassGroupActivity,
 } from "@/stores/usos"
 import { useUsosStore } from "@/stores/usos"
+import { mode } from "@/utils/mode"
 import type { Ref } from "vue"
 import { computed } from "vue"
 
@@ -35,7 +35,7 @@ export interface Schedule {
 }
 
 function getClassGroupSchedule(activities: Activity[]): Schedule | null {
-    const classGroupActivities: BaseClassGroupActivity[] = activities.filter(
+    const classGroupActivities = activities.filter(
         (activity) =>
             activity.type === "classgroup" || activity.type === "classgroup2",
     ) as (ClassGroupActivity | ClassGroup2Activity)[]
@@ -44,41 +44,32 @@ function getClassGroupSchedule(activities: Activity[]): Schedule | null {
         return null
     }
 
-    const dayCount: Record<number, number> = {}
-
-    let weekA = 0
-    let weekB = 0
-
-    for (const activity of classGroupActivities) {
-        const startTime = new Date(activity.start_time)
-
-        const day = startTime.getDay()
-        dayCount[day] = (dayCount[day] ?? 0) + 1
-
-        if (getWeekOfYear(startTime) % 2 === 1) {
-            weekA++
-        } else {
-            weekB++
-        }
-    }
-
-    const day = parseInt(
-        Object.entries(dayCount).sort((a, b) => b[1] - a[1])[0][0],
-    )
-
-    const secondStartTime = new Date(classGroupActivities[2].start_time)
-    const secondEndTime = new Date(classGroupActivities[2].end_time)
-
     return {
-        day,
-        startHour: secondStartTime.getHours(),
-        startMinute: secondStartTime.getMinutes(),
-        endHour: secondEndTime.getHours(),
-        endMinute: secondEndTime.getMinutes(),
+        day: mode(
+            classGroupActivities.map((a) => new Date(a.start_time).getDay()),
+        )!,
+        startHour: mode(
+            classGroupActivities.map((a) => new Date(a.start_time).getHours()),
+        )!,
+        startMinute: mode(
+            classGroupActivities.map((a) =>
+                new Date(a.start_time).getMinutes(),
+            ),
+        )!,
+        endHour: mode(
+            classGroupActivities.map((a) => new Date(a.end_time).getHours()),
+        )!,
+        endMinute: mode(
+            classGroupActivities.map((a) => new Date(a.end_time).getMinutes()),
+        )!,
         frequency:
-            classGroupActivities.length >= 14
+            classGroupActivities.length >= 10
                 ? Frequency.WEEKLY
-                : weekA > weekB
+                : mode(
+                      classGroupActivities.map(
+                          (a) => getWeekOfYear(new Date(a.start_time)) % 2,
+                      ),
+                  ) === 1
                 ? Frequency.BIWEEKLY_A
                 : Frequency.BIWEEKLY_B,
     }
