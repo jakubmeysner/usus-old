@@ -1,9 +1,17 @@
 <script lang="ts" setup>
 import type { Schedule } from "@/composables/views/timetable-simulator/class-group-schedule"
-import { Frequency, getClassGroupSchedule } from "@/composables/views/timetable-simulator/class-group-schedule"
+import {
+    Frequency,
+    getClassGroupSchedule,
+} from "@/composables/views/timetable-simulator/class-group-schedule"
 import { useCourseIds } from "@/composables/views/timetable-simulator/course-ids"
 import { useTermId } from "@/composables/views/timetable-simulator/term-id"
-import type { BaseClassGroupActivity, ClassGroup2Activity, ClassGroupActivity, CourseEdition } from "@/stores/usos"
+import type {
+    BaseClassGroupActivity,
+    ClassGroup2Activity,
+    ClassGroupActivity,
+    CourseEdition,
+} from "@/stores/usos"
 import { useUsosStore } from "@/stores/usos"
 import type { CalendarOptions, EventInput } from "@fullcalendar/core"
 import plLocale from "@fullcalendar/core/locales/pl"
@@ -53,15 +61,14 @@ const schedules = computed<Schedule[]>(() => {
     const schedules: Schedule[] = []
 
     for (const [unitId, groupNumber] of groups.value) {
-        const activities = ((usosStore.classGroupDates[unitId]?.[groupNumber]?.filter(
-            (activity) =>
-                activity.type === "classgroup" ||
-                activity.type === "classgroup2",
-        ) as (ClassGroupActivity | ClassGroup2Activity)[]) ?? [])
+        const activities =
+            (usosStore.classGroupDates[unitId]?.[groupNumber]?.filter(
+                (activity) =>
+                    activity.type === "classgroup" ||
+                    activity.type === "classgroup2",
+            ) as (ClassGroupActivity | ClassGroup2Activity)[]) ?? []
 
-        const schedule = getClassGroupSchedule(
-            activities,
-        )
+        const schedule = getClassGroupSchedule(activities)
 
         if (schedule !== null) {
             schedules.push(schedule)
@@ -92,9 +99,7 @@ const termView = ref(true)
 const events = computed<EventInput[]>(() => {
     if (termView.value) {
         return schedules.value.map((schedule) => {
-            let title = `${schedule.secondActivity.classtype_id} — ${
-                schedule.secondActivity.course_name.pl
-            }`
+            let title = `${schedule.secondActivity.classtype_id} — ${schedule.secondActivity.course_name.pl}`
 
             if (schedule.frequency === Frequency.BIWEEKLY_A) {
                 title += " — co 2 tygodnie (A)"
@@ -122,10 +127,10 @@ const events = computed<EventInput[]>(() => {
                     schedule.secondActivity.classtype_id === "W"
                         ? "#4CAF50"
                         : schedule.secondActivity.classtype_id === "C"
-                            ? "#9C27B0"
-                            : schedule.secondActivity.classtype_id === "L"
-                                ? "#3F51B5"
-                                : "#FF5722",
+                        ? "#9C27B0"
+                        : schedule.secondActivity.classtype_id === "L"
+                        ? "#3F51B5"
+                        : "#FF5722",
             }
         })
     } else {
@@ -137,10 +142,10 @@ const events = computed<EventInput[]>(() => {
                 activity.classtype_id === "W"
                     ? "#4CAF50"
                     : activity.classtype_id === "C"
-                        ? "#9C27B0"
-                        : activity.classtype_id === "L"
-                            ? "#3F51B5"
-                            : "#FF5722",
+                    ? "#9C27B0"
+                    : activity.classtype_id === "L"
+                    ? "#3F51B5"
+                    : "#FF5722",
         }))
     }
 })
@@ -179,14 +184,14 @@ const options = computed<CalendarOptions>(() => ({
     height: "80vh",
     validRange: termView.value
         ? {
-            start: new Date(1973, 0),
-            end: new Date(1973, 0, 8),
-        }
+              start: new Date(1973, 0),
+              end: new Date(1973, 0, 8),
+          }
         : undefined,
     dayHeaderFormat: termView.value
         ? {
-            weekday: "long",
-        }
+              weekday: "long",
+          }
         : undefined,
     headerToolbar: termView.value ? false : undefined,
 }))
@@ -196,9 +201,7 @@ const options = computed<CalendarOptions>(() => ({
     <v-card>
         <template #title>
             <div class="d-flex justify-space-between align-center">
-                <div>
-                    Plan
-                </div>
+                <div>Plan</div>
 
                 <div>
                     <v-switch
@@ -214,15 +217,9 @@ const options = computed<CalendarOptions>(() => ({
         </template>
 
         <template v-if="firstActivityDate !== null" #text>
-            <full-calendar
-                v-if="termView"
-                :options="options"
-            />
+            <full-calendar v-if="termView" :options="options" />
 
-            <full-calendar
-                v-else
-                :options="options"
-            />
+            <full-calendar v-else :options="options" />
         </template>
     </v-card>
 </template>
