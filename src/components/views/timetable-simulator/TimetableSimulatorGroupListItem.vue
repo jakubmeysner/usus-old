@@ -1,17 +1,15 @@
 <script lang="ts" setup>
-import {
-    Frequency,
-    useClassGroupSchedule,
-} from "@/composables/views/timetable-simulator/class-group-schedule"
+import { Frequency, useClassGroupSchedules } from "@/composables/views/timetable-simulator/class-group-schedule"
 import { useTermId } from "@/composables/views/timetable-simulator/term-id"
 import { useUnitGroupNumber } from "@/composables/views/timetable-simulator/unit-group-number"
-import { useUsosStore } from "@/stores/usos"
 import type {
     Activity,
     BaseClassGroupActivity,
+    ClassGroup2Activity,
+    ClassGroupActivity,
     CourseEdition,
 } from "@/stores/usos"
-import type { ClassGroup2Activity, ClassGroupActivity } from "@/stores/usos"
+import { useUsosStore } from "@/stores/usos"
 import { computed } from "vue"
 
 const usosStore = useUsosStore()
@@ -56,7 +54,7 @@ const unitId = computed(() => props.unitId)
 const unitGroupNumber = useUnitGroupNumber(unitId)
 
 const groupNumber = computed(() => props.groupNumber)
-const schedule = useClassGroupSchedule(unitId, groupNumber)
+const schedules = useClassGroupSchedules(unitId, groupNumber)
 
 const dayNames: Record<number, string> = {
     0: "niedziela",
@@ -75,7 +73,7 @@ const frequencyNames: Record<Frequency, string> = {
 }
 
 const title = computed(() => {
-    const components: string[] = []
+    const components: string[] = [`Grupa ${props.groupNumber}`]
 
     if (lecturer.value !== undefined) {
         components.push(
@@ -83,30 +81,32 @@ const title = computed(() => {
         )
     }
 
-    if (schedule.value !== null) {
-        components.push(
-            `${dayNames[schedule.value.day]}, ${
-                schedule.value.startHour
-            }:${schedule.value.startMinute.toString().padStart(2, "0")}-${
-                schedule.value.endHour
-            }:${schedule.value.endMinute.toString().padStart(2, "0")}, ${
-                frequencyNames[schedule.value.frequency]
-            }`,
-        )
-    }
-
-    return components.join(" — ")
-})
-
-const subtitle = computed(() => {
-    const components: string[] = [`Grupa ${props.groupNumber}`]
-
     if (firstActivity.value?.building_id != null) {
         components.push(firstActivity.value.building_id.toString())
     }
 
     if (firstActivity.value?.room_number != null) {
         components.push(firstActivity.value.room_number)
+    }
+
+    return components.join(" — ")
+})
+
+const subtitle = computed(() => {
+    const components: string[] = []
+
+    if (schedules.value !== null) {
+        components.push(
+            schedules.value.map((schedule) =>
+                `${dayNames[schedule.day]}, ${
+                    schedule.startHour
+                }:${schedule.startMinute.toString().padStart(2, "0")}-${
+                    schedule.endHour
+                }:${schedule.endMinute.toString().padStart(2, "0")}, ${
+                    frequencyNames[schedule.frequency]
+                }`,
+            ).join("; "),
+        )
     }
 
     return components.join(" — ")

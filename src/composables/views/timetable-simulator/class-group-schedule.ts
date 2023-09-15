@@ -1,8 +1,4 @@
-import type {
-    Activity,
-    ClassGroup2Activity,
-    ClassGroupActivity,
-} from "@/stores/usos"
+import type { Activity, ClassGroup2Activity, ClassGroupActivity } from "@/stores/usos"
 import { useUsosStore } from "@/stores/usos"
 import { mode } from "@/utils/mode"
 import type { Ref } from "vue"
@@ -67,17 +63,43 @@ export function getClassGroupSchedule(activities: Activity[]): Schedule | null {
             classGroupActivities.length >= 10
                 ? Frequency.WEEKLY
                 : mode(
-                      classGroupActivities.map(
-                          (a) => getWeekOfYear(new Date(a.start_time)) % 2,
-                      ),
-                  ) === 1
-                ? Frequency.BIWEEKLY_A
-                : Frequency.BIWEEKLY_B,
+                    classGroupActivities.map(
+                        (a) => getWeekOfYear(new Date(a.start_time)) % 2,
+                    ),
+                ) === 1
+                    ? Frequency.BIWEEKLY_A
+                    : Frequency.BIWEEKLY_B,
         secondActivity: classGroupActivities[2],
     }
 }
 
-export function useClassGroupSchedule(
+export function getClassGroupSchedules(activities: Activity[]): Schedule[] | null {
+    const groupedActivities: Record<string, Activity[]> = {
+        undefined: [],
+    }
+
+    for (const activity of activities) {
+        if (activity.type === "classgroup" || activity.type === "classgroup2") {
+            if (activity.cgwm_id != null) {
+                if (!(activity.cgwm_id in groupedActivities)) {
+                    groupedActivities[activity.cgwm_id] = [activity]
+                } else {
+                    groupedActivities[activity.cgwm_id].push(activity)
+                }
+            } else {
+                groupedActivities.undefined.push(activity)
+            }
+        } else {
+            groupedActivities.undefined.push(activity)
+        }
+    }
+
+    return Object.values(groupedActivities)
+        .map((activities) => getClassGroupSchedule(activities))
+        .filter((schedule): schedule is Schedule => schedule !== null)
+}
+
+export function useClassGroupSchedules(
     unitId: Ref<string>,
     groupNumber: Ref<number>,
 ) {
@@ -92,6 +114,6 @@ export function useClassGroupSchedule(
             return null
         }
 
-        return getClassGroupSchedule(activities.value)
+        return getClassGroupSchedules(activities.value)
     })
 }

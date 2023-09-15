@@ -2,7 +2,7 @@
 import type { Schedule } from "@/composables/views/timetable-simulator/class-group-schedule"
 import {
     Frequency,
-    getClassGroupSchedule,
+    getClassGroupSchedules,
 } from "@/composables/views/timetable-simulator/class-group-schedule"
 import { useCourseIds } from "@/composables/views/timetable-simulator/course-ids"
 import { useTermId } from "@/composables/views/timetable-simulator/term-id"
@@ -58,7 +58,7 @@ const groups = computed<[string, number][]>(() => {
 })
 
 const schedules = computed<Schedule[]>(() => {
-    const schedules: Schedule[] = []
+    const allSchedules: Schedule[] = []
 
     for (const [unitId, groupNumber] of groups.value) {
         const activities =
@@ -68,14 +68,14 @@ const schedules = computed<Schedule[]>(() => {
                     activity.type === "classgroup2",
             ) as (ClassGroupActivity | ClassGroup2Activity)[]) ?? []
 
-        const schedule = getClassGroupSchedule(activities)
+        const schedules = getClassGroupSchedules(activities)
 
-        if (schedule !== null) {
-            schedules.push(schedule)
+        if (schedules !== null) {
+            allSchedules.push(...schedules)
         }
     }
 
-    return schedules
+    return allSchedules
 })
 
 const activities = computed(() => {
