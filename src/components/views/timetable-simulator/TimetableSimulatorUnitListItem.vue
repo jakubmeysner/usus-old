@@ -1,11 +1,6 @@
 <script lang="ts" setup>
 import TimetableSimulatorGroupListItem from "@/components/views/timetable-simulator/TimetableSimulatorGroupListItem.vue"
-import type {
-    Activity,
-    ClassGroup2Activity,
-    ClassGroupActivity,
-    CourseUnit,
-} from "@/stores/usos"
+import type { Activity, ClassGroup2Activity, ClassGroupActivity, CourseUnit } from "@/stores/usos"
 import { useUsosStore } from "@/stores/usos"
 import { computed } from "vue"
 
@@ -20,7 +15,7 @@ const unit = computed<CourseUnit | undefined>(() => {
     return usosStore.courseUnits[props.unitId]
 })
 
-const type = computed<string | undefined>(() => {
+const firstActivity = computed<ClassGroupActivity | ClassGroup2Activity | undefined>(() => {
     const activities: Activity[] | undefined =
         usosStore.classGroupDates[props.unitId]?.[1]
 
@@ -34,7 +29,19 @@ const type = computed<string | undefined>(() => {
                 activity.type === "classgroup" ||
                 activity.type === "classgroup2",
         ) as ClassGroupActivity | ClassGroup2Activity | undefined
-    )?.classtype_name?.pl
+    )
+})
+
+const type = computed<string | undefined>(() => {
+    return firstActivity.value?.classtype_name?.pl
+})
+
+const icon = computed<string | undefined>(() => {
+    if (firstActivity.value === undefined) {
+        return undefined
+    }
+
+    return `mdi-alpha-${firstActivity.value.classtype_id.toLowerCase()}`
 })
 </script>
 
@@ -47,7 +54,12 @@ const type = computed<string | undefined>(() => {
 
     <v-list-group v-else>
         <template #activator="{ props }">
-            <v-list-item :title="type" :subtitle="unit.id" v-bind="props" />
+            <v-list-item
+                :title="type"
+                :subtitle="unit.id"
+                :prepend-icon="icon"
+                v-bind="props"
+            />
         </template>
 
         <timetable-simulator-group-list-item

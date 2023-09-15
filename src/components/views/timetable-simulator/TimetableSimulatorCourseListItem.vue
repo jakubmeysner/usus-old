@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import TimetableSimulatorUnitListItem from "@/components/views/timetable-simulator/TimetableSimulatorUnitListItem.vue"
+import { useCourseIds } from "@/composables/views/timetable-simulator/course-ids"
 import { useTermId } from "@/composables/views/timetable-simulator/term-id"
 import type { Course, CourseEdition } from "@/stores/usos"
 import { useUsosStore } from "@/stores/usos"
@@ -7,6 +8,7 @@ import { computed, onMounted, watch } from "vue"
 
 const usosStore = useUsosStore()
 const termId = useTermId()
+const courseIds = useCourseIds()
 
 const props = defineProps<{
     courseId: string
@@ -61,6 +63,11 @@ watch(
         immediate: true,
     },
 )
+
+function deleteCourse(): void {
+    courseIds.value = courseIds.value
+        .filter((courseId) => courseId !== props.courseId)
+}
 </script>
 
 <template>
@@ -85,6 +92,12 @@ watch(
                 :key="unitId"
                 :course-id="props.courseId"
                 :unit-id="unitId"
+            />
+
+            <v-list-item
+                title="Usuń kurs"
+                prepend-icon="mdi-minus"
+                @click="deleteCourse()"
             />
         </template>
     </v-list-group>
