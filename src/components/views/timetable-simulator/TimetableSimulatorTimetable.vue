@@ -178,10 +178,8 @@ const options = computed<CalendarOptions>(() => ({
     initialDate: termView.value
         ? new Date(1973, 0)
         : firstActivityDate.value ?? new Date(),
-    slotMinTime: "7:30:00",
-    slotMaxTime: "20:35:00",
     expandRows: true,
-    height: "80vh",
+    height: "auto",
     validRange: termView.value
         ? {
               start: new Date(1973, 0),
