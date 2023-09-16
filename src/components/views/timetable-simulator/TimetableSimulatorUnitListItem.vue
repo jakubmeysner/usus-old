@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import TimetableSimulatorGroupListItem from "@/components/views/timetable-simulator/TimetableSimulatorGroupListItem.vue"
-import type { Activity, ClassGroup2Activity, ClassGroupActivity, CourseUnit } from "@/stores/usos"
+import type {
+    Activity,
+    ClassGroup2Activity,
+    ClassGroupActivity,
+    CourseUnit,
+} from "@/stores/usos"
 import { useUsosStore } from "@/stores/usos"
 import { computed } from "vue"
 
@@ -15,7 +20,9 @@ const unit = computed<CourseUnit | undefined>(() => {
     return usosStore.courseUnits[props.unitId]
 })
 
-const firstActivity = computed<ClassGroupActivity | ClassGroup2Activity | undefined>(() => {
+const firstActivity = computed<
+    ClassGroupActivity | ClassGroup2Activity | undefined
+>(() => {
     const activities: Activity[] | undefined =
         usosStore.classGroupDates[props.unitId]?.[1]
 
@@ -23,13 +30,10 @@ const firstActivity = computed<ClassGroupActivity | ClassGroup2Activity | undefi
         return undefined
     }
 
-    return (
-        activities.find(
-            (activity) =>
-                activity.type === "classgroup" ||
-                activity.type === "classgroup2",
-        ) as ClassGroupActivity | ClassGroup2Activity | undefined
-    )
+    return activities.find(
+        (activity) =>
+            activity.type === "classgroup" || activity.type === "classgroup2",
+    ) as ClassGroupActivity | ClassGroup2Activity | undefined
 })
 
 const type = computed<string | undefined>(() => {

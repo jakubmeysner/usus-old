@@ -50,10 +50,13 @@ watch(
 
                 await Promise.all(
                     courseUnit.class_groups.map(async (group) => {
-                        await usosStore.loadClassGroupDates(
-                            unitId,
-                            group.number,
-                        )
+                        await Promise.all([
+                            usosStore.loadClassGroupDates(unitId, group.number),
+                            usosStore.loadClassGroupParticipantCount(
+                                unitId,
+                                group.number,
+                            ),
+                        ])
                     }),
                 )
             }),
@@ -65,8 +68,9 @@ watch(
 )
 
 function deleteCourse(): void {
-    courseIds.value = courseIds.value
-        .filter((courseId) => courseId !== props.courseId)
+    courseIds.value = courseIds.value.filter(
+        (courseId) => courseId !== props.courseId,
+    )
 }
 </script>
 

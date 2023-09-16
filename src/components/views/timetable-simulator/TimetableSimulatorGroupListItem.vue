@@ -1,5 +1,8 @@
 <script lang="ts" setup>
-import { Frequency, useClassGroupSchedules } from "@/composables/views/timetable-simulator/class-group-schedule"
+import {
+    Frequency,
+    useClassGroupSchedules,
+} from "@/composables/views/timetable-simulator/class-group-schedule"
 import { useTermId } from "@/composables/views/timetable-simulator/term-id"
 import { useUnitGroupNumber } from "@/composables/views/timetable-simulator/unit-group-number"
 import type {
@@ -55,6 +58,10 @@ const unitGroupNumber = useUnitGroupNumber(unitId)
 
 const groupNumber = computed(() => props.groupNumber)
 const schedules = useClassGroupSchedules(unitId, groupNumber)
+const participantCount = computed(
+    () =>
+        usosStore.classGroupParticipantCount[unitId.value]?.[groupNumber.value],
+)
 
 const dayNames: Record<number, string> = {
     0: "niedziela",
@@ -89,6 +96,12 @@ const title = computed(() => {
         components.push(firstActivity.value.room_number)
     }
 
+    if (participantCount.value !== undefined) {
+        components.push(
+            `${participantCount.value.count}/${participantCount.value.limit}`,
+        )
+    }
+
     return components.join(" — ")
 })
 
@@ -97,19 +110,38 @@ const subtitle = computed(() => {
 
     if (schedules.value !== null) {
         components.push(
-            schedules.value.map((schedule) =>
-                `${dayNames[schedule.day]}, ${
-                    schedule.startHour
-                }:${schedule.startMinute.toString().padStart(2, "0")}-${
-                    schedule.endHour
-                }:${schedule.endMinute.toString().padStart(2, "0")}, ${
-                    frequencyNames[schedule.frequency]
-                }`,
-            ).join("; "),
+            schedules.value
+                .map(
+                    (schedule) =>
+                        `${dayNames[schedule.day]}, ${
+                            schedule.startHour
+                        }:${schedule.startMinute.toString().padStart(2, "0")}-${
+                            schedule.endHour
+                        }:${schedule.endMinute.toString().padStart(2, "0")}, ${
+                            frequencyNames[schedule.frequency]
+                        }`,
+                )
+                .join("; "),
         )
     }
 
     return components.join(" — ")
+})
+
+const baseColor = computed(() => {
+    if (participantCount.value === undefined) {
+        return undefined
+    }
+
+    if (participantCount.value.count >= participantCount.value.limit) {
+        return "red-accent-1"
+    }
+
+    if (participantCount.value.count / participantCount.value.limit >= 0.75) {
+        return "orange-accent-1"
+    }
+
+    return undefined
 })
 </script>
 
@@ -129,6 +161,7 @@ const subtitle = computed(() => {
                 ? 'mdi-radiobox-marked'
                 : 'mdi-radiobox-blank'
         "
+        :base-color="baseColor"
         :active="unitGroupNumber === props.groupNumber"
         @click="unitGroupNumber = props.groupNumber"
     />

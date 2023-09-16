@@ -137,6 +137,11 @@ export type Activity =
     | MeetingActivity
     | ExamActivity
 
+export interface ParticipantCount {
+    count: number
+    limit: number
+}
+
 export const useUsosStore = defineStore("usos", {
     state: () => ({
         terms: null as Term[] | null,
@@ -147,6 +152,10 @@ export const useUsosStore = defineStore("usos", {
         >,
         courseUnits: {} as Record<string, CourseUnit>,
         classGroupDates: {} as Record<string, Record<number, Activity[]>>,
+        classGroupParticipantCount: {} as Record<
+            string,
+            Record<number, ParticipantCount>
+        >,
     }),
     actions: {
         async loadTerms(): Promise<void> {
@@ -228,6 +237,29 @@ export const useUsosStore = defineStore("usos", {
             if (response.status === 200) {
                 this.classGroupDates[unitId][groupNumber] =
                     (await response.json()) as Activity[]
+            } else {
+                throw new Error(
+                    `An unexpected error has occurred, status ${response.status}`,
+                )
+            }
+        },
+        async loadClassGroupParticipantCount(
+            unitId: string,
+            groupNumber: number,
+        ): Promise<void> {
+            if (!(unitId in this.classGroupParticipantCount)) {
+                this.classGroupParticipantCount[unitId] = {}
+            }
+
+            const response = await fetch(
+                `${
+                    import.meta.env.VITE_NETLIFY_FUNCTIONS_BASE_URL
+                }/participant-count?unitId=${unitId}&groupNumber=${groupNumber}`,
+            )
+
+            if (response.status === 200) {
+                this.classGroupParticipantCount[unitId][groupNumber] =
+                    (await response.json()) as ParticipantCount
             } else {
                 throw new Error(
                     `An unexpected error has occurred, status ${response.status}`,

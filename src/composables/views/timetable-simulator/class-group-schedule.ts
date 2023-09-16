@@ -1,4 +1,8 @@
-import type { Activity, ClassGroup2Activity, ClassGroupActivity } from "@/stores/usos"
+import type {
+    Activity,
+    ClassGroup2Activity,
+    ClassGroupActivity,
+} from "@/stores/usos"
 import { useUsosStore } from "@/stores/usos"
 import { mode } from "@/utils/mode"
 import type { Ref } from "vue"
@@ -63,17 +67,19 @@ export function getClassGroupSchedule(activities: Activity[]): Schedule | null {
             classGroupActivities.length >= 10
                 ? Frequency.WEEKLY
                 : mode(
-                    classGroupActivities.map(
-                        (a) => getWeekOfYear(new Date(a.start_time)) % 2,
-                    ),
-                ) === 1
-                    ? Frequency.BIWEEKLY_A
-                    : Frequency.BIWEEKLY_B,
+                      classGroupActivities.map(
+                          (a) => getWeekOfYear(new Date(a.start_time)) % 2,
+                      ),
+                  ) === 1
+                ? Frequency.BIWEEKLY_A
+                : Frequency.BIWEEKLY_B,
         secondActivity: classGroupActivities[2],
     }
 }
 
-export function getClassGroupSchedules(activities: Activity[]): Schedule[] | null {
+export function getClassGroupSchedules(
+    activities: Activity[],
+): Schedule[] | null {
     const groupedActivities: Record<string, Activity[]> = {
         undefined: [],
     }
