@@ -102,9 +102,9 @@ const events = computed<EventInput[]>(() => {
             let title = `${schedule.secondActivity.classtype_id} — ${schedule.secondActivity.course_name.pl}`
 
             if (schedule.frequency === Frequency.BIWEEKLY_A) {
-                title += " — co 2 tygodnie (A)"
+                title += " — co 2 tyg. (A)"
             } else if (schedule.frequency === Frequency.BIWEEKLY_B) {
-                title += " — co 2 tygodnie (B)"
+                title += " — co 2 tyg. (B)"
             }
 
             return {
