@@ -103,10 +103,10 @@ const events = computed<EventInput[]>(() => {
 
             if (schedule.frequency === Frequency.BIWEEKLY_A) {
                 title = "(A) " + title
-                title += " — co 2 tyg. (A)"
+                title += " — co 2 tyg."
             } else if (schedule.frequency === Frequency.BIWEEKLY_B) {
-                title += "(B) " + title
-                title += " — co 2 tyg. (B)"
+                title = "(B) " + title
+                title += " — co 2 tyg."
             }
 
             return {
