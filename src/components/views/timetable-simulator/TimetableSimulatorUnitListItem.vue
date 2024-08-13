@@ -1,13 +1,9 @@
 <script lang="ts" setup>
 import TimetableSimulatorGroupListItem from "@/components/views/timetable-simulator/TimetableSimulatorGroupListItem.vue"
-import type {
-    Activity,
-    ClassGroup2Activity,
-    ClassGroupActivity,
-    CourseUnit,
-} from "@/stores/usos"
+import type { Activity, ClassGroup2Activity, ClassGroupActivity, CourseUnit } from "@/stores/usos"
 import { useUsosStore } from "@/stores/usos"
 import { computed } from "vue"
+import { useUnitGroupNumber } from "@/composables/views/timetable-simulator/unit-group-number"
 
 const usosStore = useUsosStore()
 
@@ -47,6 +43,9 @@ const icon = computed<string | undefined>(() => {
 
     return `mdi-alpha-${firstActivity.value.classtype_id.toLowerCase()}`
 })
+
+const unitId = computed(() => props.unitId)
+const unitGroupNumber = useUnitGroupNumber(unitId)
 </script>
 
 <template>
@@ -65,6 +64,18 @@ const icon = computed<string | undefined>(() => {
                 v-bind="props"
             />
         </template>
+
+        <v-list-item
+            title="Brak"
+            :prepend-icon="
+                unitGroupNumber === null
+                    ? 'mdi-radiobox-marked'
+                    : 'mdi-radiobox-blank'
+            "
+            :active="unitGroupNumber === null"
+            @click="unitGroupNumber = null"
+        />
+
 
         <timetable-simulator-group-list-item
             v-for="group in unit.class_groups"

@@ -2,6 +2,8 @@ import type { Ref } from "vue"
 import { computed } from "vue"
 import { useRoute, useRouter } from "vue-router"
 
+const NONE = "none"
+
 export function useUnitGroupNumber(unitId: Ref<string>) {
     const router = useRouter()
     const route = useRoute()
@@ -10,21 +12,22 @@ export function useUnitGroupNumber(unitId: Ref<string>) {
         return `unitGroupNumber[${unitId.value}]`
     })
 
-    return computed<number>({
+    return computed<number | null>({
         get: () => {
             const value = route.query[queryKey.value]
+            const actualValue = Array.isArray(value) ? value[0] : value
 
-            if (Array.isArray(value)) {
-                return Number(value[0])
-            } else {
-                return Number(value ?? 1)
+            if (actualValue === NONE) {
+                return null
             }
+
+            return Number(actualValue ?? 1)
         },
-        set: (value) => {
-            router.replace({
+        set: async (value) => {
+            await router.replace({
                 query: {
                     ...route.query,
-                    [queryKey.value]: value,
+                    [queryKey.value]: value === null ? NONE : value,
                 },
             })
         },
