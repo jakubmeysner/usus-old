@@ -18,7 +18,7 @@ const appStore = useAppStore()
                 <template #actions>
                     <v-btn
                         text="GitHub"
-                        href="https://github.com/jakubmeysner/usus"
+                        href="https://github.com/jakubmeysner/usus-old"
                         target="_blank"
                         rel="noopener noreferrer"
                     />
