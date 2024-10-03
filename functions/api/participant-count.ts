@@ -46,5 +46,5 @@ export const onRequest: PagesFunction<Env> = async (context) => {
 
     const participantCount = await getParticipantCount(unitId, groupNumber)
 
-    return new Response(participantCount)
+    return Response.json(participantCount)
 }
