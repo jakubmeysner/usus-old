@@ -8,14 +8,28 @@ async function fetchParticipantCount(
     groupNumber: number,
 ): Promise<ParticipantCount> {
     const response = await fetch(
-        `https://old.usus.jakmey.com/.netlify/functions/participant-count?unitId=${unitId}&groupNumber=${groupNumber}`,
+        `https://web.usos.pwr.edu.pl/kontroler.php?_action=katalog2/przedmioty/pokazZajecia&gr_nr=${groupNumber}&zaj_cyk_id=${unitId}`,
     )
 
     if (response.status !== 200) {
         throw new Error(`Received ${response.status} response status code`)
     }
 
-    return await response.json()
+    const text = await response.text()
+    const match = text.match(
+        /Liczba osób w grupie:\D+(\d+)\D+Limit miejsc:\D+(\d+)/s,
+    )
+
+    if (match === null) {
+        throw new Error(
+            `Could not find a match for participant count in document`,
+        )
+    }
+
+    return {
+        count: parseInt(match[1]),
+        limit: parseInt(match[2]),
+    }
 }
 
 async function getParticipantCount(
