@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import TimetableSimulatorGroupListItem from "@/components/views/timetable-simulator/TimetableSimulatorGroupListItem.vue"
-import type { Activity, ClassGroup2Activity, ClassGroupActivity, CourseUnit } from "@/stores/usos"
+import type {
+    Activity,
+    ClassGroup2Activity,
+    ClassGroupActivity,
+    CourseUnit,
+} from "@/stores/usos"
 import { useUsosStore } from "@/stores/usos"
 import { computed } from "vue"
 import { useUnitGroupNumber } from "@/composables/views/timetable-simulator/unit-group-number"
@@ -75,7 +80,6 @@ const unitGroupNumber = useUnitGroupNumber(unitId)
             :active="unitGroupNumber === null"
             @click="unitGroupNumber = null"
         />
-
 
         <timetable-simulator-group-list-item
             v-for="group in unit.class_groups"
