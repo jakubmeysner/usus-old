@@ -253,7 +253,7 @@ export const useUsosStore = defineStore("usos", {
 
             const response = await fetch(
                 `${
-                    import.meta.env.VITE_NETLIFY_FUNCTIONS_BASE_URL
+                    import.meta.env.VITE_FUNCTIONS_BASE_URL
                 }/participant-count?unitId=${unitId}&groupNumber=${groupNumber}`,
             )
 
